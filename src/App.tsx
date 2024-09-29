@@ -9,14 +9,50 @@ import {
   VStack,
   HStack,
 } from "@chakra-ui/react";
+import temperatureConversion from "./conversions/temperatureConversion";
 
 function App() {
+  const units = {
+    Temperature: ["Celsius", "Fahrenheit", "Kelvin"],
+    Length: [
+      "Millimeters",
+      "Centimeters",
+      "Meters",
+      "Kilometers",
+      "Inches",
+      "Feet",
+      "Yards",
+      "Miles",
+    ],
+    Weight: ["Milligrams", "Grams", "Kilograms", "Ounces", "Pounds"],
+  };
+
+  type UnitType = keyof typeof units;
+  type Unit = string;
   const [inputValue, setInputValue] = useState("");
   const [result, setResult] = useState("");
+  const [fromUnit, setFromUnit] = useState("");
+  const [toUnit, setToUnit] = useState("");
+  const [type, setType] = useState<UnitType | "">("");
+  const [aviableUnits, setAviableUnits] = useState<Unit[]>([]);
 
   const handleConvert = () => {
-    // Conversion logic goes here
-    //setResult(); // Example conversion (millimeters to centimeters)
+    const value = parseFloat(inputValue);
+    let convertedValue: number | string = value;
+    switch (type) {
+      case "Temperature":
+        convertedValue = temperatureConversion(value, fromUnit, toUnit);
+        break;
+      case "Length":
+        //result = lengthConversion(value, fromUnit, toUnit);
+        break;
+      case "Weight":
+        //result = weightConversion(value, fromUnit, toUnit);
+        break;
+      default:
+        break;
+    }
+    setResult(convertedValue.toString());
   };
 
   return (
@@ -32,18 +68,30 @@ function App() {
           <Text fontSize="xl" fontWeight="bold">
             Unit Converter
           </Text>
-
-          <Select placeholder="Length">
-            <option value="length">Length</option>
-            <option value="weight">Weight</option>
-            <option value="temperature">Volume</option>
+          <Select
+            placeholder="Select type"
+            onChange={(e) => setType(e.target.value as UnitType)}
+          >
+            {Object.keys(units).map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
           </Select>
 
           <HStack spacing={2} width="full">
-            <Select placeholder="Millimeters">
-              <option value="millimeters">Millimeters</option>
-              <option value="centimeters">Centimeters</option>
-              <option value="meters">Meters</option>
+            <Select
+              placeholder="From Unit"
+              onChange={(e) => setFromUnit(e.target.value)}
+              isDisabled={!type}
+              value={fromUnit}
+            >
+              {type &&
+                units[type].map((unit) => (
+                  <option key={unit} value={unit}>
+                    {unit}
+                  </option>
+                ))}
             </Select>
             <Input
               placeholder="Enter value"
@@ -52,19 +100,37 @@ function App() {
             />
           </HStack>
 
-          <HStack spacing={2} width="full">
-            <Select placeholder="Centimeters">
-              <option value="millimeters">Millimeters</option>
-              <option value="centimeters">Centimeters</option>
-              <option value="meters">Meters</option>
+          <HStack
+            spacing={2}
+            maxW="full"
+            width="full"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Select
+              placeholder="To unit"
+              onChange={(e) => setToUnit(e.target.value)}
+              isDisabled={!type}
+              value={toUnit}
+              maxW="150px"
+            >
+              {type &&
+                units[type].map((unit) => (
+                  <option key={unit} value={unit}>
+                    {unit}
+                  </option>
+                ))}
             </Select>
-            <Input placeholder="Result" value={result} isReadOnly />
+            <Text flex="1" textAlign="center" fontWeight={'bold'} textColor={'blue'}>
+              {result}
+            </Text>
           </HStack>
 
           <Button
             width="full"
             colorScheme="blackAlpha"
             onClick={handleConvert}
+            isDisabled={!type || !fromUnit || !toUnit || !inputValue}
           >
             Convert
           </Button>

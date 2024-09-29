@@ -10,49 +10,34 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import temperatureConversion from "./conversions/temperatureConversion";
-
+import lengthConversion from "./conversions/lengthConversions";
 function App() {
   const units = {
-    Temperature: ["Celsius", "Fahrenheit", "Kelvin"],
-    Length: [
-      "Millimeters",
-      "Centimeters",
-      "Meters",
-      "Kilometers",
-      "Inches",
-      "Feet",
-      "Yards",
-      "Miles",
-    ],
-    Weight: ["Milligrams", "Grams", "Kilograms", "Ounces", "Pounds"],
+    Temperature: ["celsius", "fahrenheit", "kelvin"],
+    Length: ["millimeters","centimeters","meters","kilometers","inches","feet","yards","miles",],
+    Weight: ["milligrams", "grams", "kilograms", "ounces", "pounds"],
   };
 
+  type LengthUnit = typeof units["Length"][number];
+  type TemperatureUnit = typeof units["Temperature"][number];
+  type WeightUnit = typeof units["Weight"][number];
+
+
   type UnitType = keyof typeof units;
-  type Unit = string;
+  //type Unit = string;
   const [inputValue, setInputValue] = useState("");
   const [result, setResult] = useState("");
   const [fromUnit, setFromUnit] = useState("");
   const [toUnit, setToUnit] = useState("");
   const [type, setType] = useState<UnitType | "">("");
-  const [aviableUnits, setAviableUnits] = useState<Unit[]>([]);
+  //const [aviableUnits, setAviableUnits] = useState<Unit[]>([]);
 
   const handleConvert = () => {
     const value = parseFloat(inputValue);
-    let convertedValue: number | string = value;
-    switch (type) {
-      case "Temperature":
-        convertedValue = temperatureConversion(value, fromUnit, toUnit);
-        break;
-      case "Length":
-        //result = lengthConversion(value, fromUnit, toUnit);
-        break;
-      case "Weight":
-        //result = weightConversion(value, fromUnit, toUnit);
-        break;
-      default:
-        break;
+    if(isNaN(value)){
+      alert('Provide a valid number');
+      return;
     }
-    setResult(convertedValue.toString());
   };
 
   return (

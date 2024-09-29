@@ -1,10 +1,11 @@
 import lengthConversion, {LengthUnit} from "./lengthConversions";
 import temperatureConversion, {TemperatureUnit} from "./temperatureConversion";
+import weightConversion, {WeightUnit} from "./weightConversion";
 
 export const units = {
     Temperature: ["celsius", "fahrenheit", "kelvin"] as const,
     Length: ["millimeter", "centimeter", "meter", "kilometer", "inch", "foot", "yard", "mile",] as const,
-    Weight: ["milligram", "gram", "kilogram", "ounce", "pound"] as const,
+    Weight: ["milligram", "gram", "kilogram", "ounce", "pound", 'ton'] as const,
 };
 
 export type UnitType = keyof typeof units;
@@ -31,7 +32,12 @@ const unitConverter = (value: number, type: UnitType, fromUnit: string, toUnit: 
               fromUnit as TemperatureUnit,
               toUnit as TemperatureUnit
             );
-          // TODO: Add Weight
+          case "Weight":
+            return weightConversion(
+              value,
+              fromUnit as WeightUnit,
+              toUnit as WeightUnit
+            );
           default:
             throw new Error("Invalid conversion type provided.");
         }

@@ -1,42 +1,27 @@
 import { useState } from "react";
-import {
-  Box,
-  Text,
-  Select,
-  Input,
-  Button,
-  Center,
-  VStack,
-  HStack,
-} from "@chakra-ui/react";
-import temperatureConversion from "./conversions/temperatureConversion";
-import lengthConversion from "./conversions/lengthConversions";
+import { Box, Text, Select, Input, Button, Center, VStack, HStack,} from "@chakra-ui/react";
+import unitConverter, { UnitType, units } from "./conversions/unitConvert";
+
 function App() {
-  const units = {
-    Temperature: ["celsius", "fahrenheit", "kelvin"],
-    Length: ["millimeters","centimeters","meters","kilometers","inches","feet","yards","miles",],
-    Weight: ["milligrams", "grams", "kilograms", "ounces", "pounds"],
-  };
-
-  type LengthUnit = typeof units["Length"][number];
-  type TemperatureUnit = typeof units["Temperature"][number];
-  type WeightUnit = typeof units["Weight"][number];
-
-
-  type UnitType = keyof typeof units;
-  //type Unit = string;
   const [inputValue, setInputValue] = useState("");
-  const [result, setResult] = useState("");
+  const [result, setResult] = useState("-");
   const [fromUnit, setFromUnit] = useState("");
   const [toUnit, setToUnit] = useState("");
   const [type, setType] = useState<UnitType | "">("");
-  //const [aviableUnits, setAviableUnits] = useState<Unit[]>([]);
 
   const handleConvert = () => {
-    const value = parseFloat(inputValue);
-    if(isNaN(value)){
-      alert('Provide a valid number');
-      return;
+    try {
+      const value = parseFloat(inputValue);
+      if (isNaN(value)) {
+        alert("Provide a valid number");
+        return;
+      }
+      if(type && fromUnit && toUnit){
+        const convertedValue = unitConverter(value, type as UnitType, fromUnit, toUnit);
+        setResult(convertedValue.toString())
+      }
+    } catch (error) {
+      alert((error as Error).message);
     }
   };
 
@@ -50,7 +35,7 @@ function App() {
         borderRadius="lg"
       >
         <VStack spacing={4}>
-          <Text fontSize="xl" fontWeight="bold">
+          <Text fontSize="3xl" fontWeight="bold">
             Unit Converter
           </Text>
           <Select
@@ -106,7 +91,12 @@ function App() {
                   </option>
                 ))}
             </Select>
-            <Text flex="1" textAlign="center" fontWeight={'bold'} textColor={'blue'}>
+            <Text
+              flex="1"
+              textAlign="center"
+              fontWeight={"bold"}
+              textColor={"blue"}
+            >
               {result}
             </Text>
           </HStack>

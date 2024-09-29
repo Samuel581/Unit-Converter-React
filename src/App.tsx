@@ -1,58 +1,28 @@
 import { useState } from "react";
-import {
-  Box,
-  Text,
-  Select,
-  Input,
-  Button,
-  Center,
-  VStack,
-  HStack,
-} from "@chakra-ui/react";
-import temperatureConversion from "./conversions/temperatureConversion";
+import { Box, Text, Select, Input, Button, Center, VStack, HStack,} from "@chakra-ui/react";
+import unitConverter, { UnitType, units } from "./conversions/unitConvert";
 
 function App() {
-  const units = {
-    Temperature: ["Celsius", "Fahrenheit", "Kelvin"],
-    Length: [
-      "Millimeters",
-      "Centimeters",
-      "Meters",
-      "Kilometers",
-      "Inches",
-      "Feet",
-      "Yards",
-      "Miles",
-    ],
-    Weight: ["Milligrams", "Grams", "Kilograms", "Ounces", "Pounds"],
-  };
-
-  type UnitType = keyof typeof units;
-  type Unit = string;
   const [inputValue, setInputValue] = useState("");
-  const [result, setResult] = useState("");
+  const [result, setResult] = useState("-");
   const [fromUnit, setFromUnit] = useState("");
   const [toUnit, setToUnit] = useState("");
   const [type, setType] = useState<UnitType | "">("");
-  const [aviableUnits, setAviableUnits] = useState<Unit[]>([]);
 
   const handleConvert = () => {
-    const value = parseFloat(inputValue);
-    let convertedValue: number | string = value;
-    switch (type) {
-      case "Temperature":
-        convertedValue = temperatureConversion(value, fromUnit, toUnit);
-        break;
-      case "Length":
-        //result = lengthConversion(value, fromUnit, toUnit);
-        break;
-      case "Weight":
-        //result = weightConversion(value, fromUnit, toUnit);
-        break;
-      default:
-        break;
+    try {
+      const value = parseFloat(inputValue);
+      if (isNaN(value)) {
+        alert("Provide a valid number");
+        return;
+      }
+      if(type && fromUnit && toUnit){
+        const convertedValue = unitConverter(value, type as UnitType, fromUnit, toUnit);
+        setResult(convertedValue.toString())
+      }
+    } catch (error) {
+      alert((error as Error).message);
     }
-    setResult(convertedValue.toString());
   };
 
   return (
@@ -65,7 +35,7 @@ function App() {
         borderRadius="lg"
       >
         <VStack spacing={4}>
-          <Text fontSize="xl" fontWeight="bold">
+          <Text fontSize="3xl" fontWeight="bold">
             Unit Converter
           </Text>
           <Select
@@ -121,7 +91,12 @@ function App() {
                   </option>
                 ))}
             </Select>
-            <Text flex="1" textAlign="center" fontWeight={'bold'} textColor={'blue'}>
+            <Text
+              flex="1"
+              textAlign="center"
+              fontWeight={"bold"}
+              textColor={"blue"}
+            >
               {result}
             </Text>
           </HStack>
